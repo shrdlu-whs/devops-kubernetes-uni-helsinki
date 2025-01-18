@@ -2,7 +2,7 @@
 # https://github.com/marketplace/actions/authenticate-to-google-cloud#indirect-wif  
 
 
-name: Build and Deploy todo backend to GKE
+name: Build and deploy todo backend to GKE
 
 on:
   push:
