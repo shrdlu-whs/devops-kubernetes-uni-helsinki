@@ -1,8 +1,6 @@
 import os
 from flask import Flask, request, redirect, url_for, jsonify
 from flask_sqlalchemy import SQLAlchemy
-#from flask_healthz import healthz, HealthError
-#from flask_healthz import Healthz
 from sqlalchemy.sql import text
 from database import db
 from models import Todo
