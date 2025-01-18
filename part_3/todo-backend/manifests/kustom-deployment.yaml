@@ -20,7 +20,7 @@ spec:
       #    args: ["until echo 'Waiting for postgres...' && nc -vz -w 2 postgres 5432 do echo 'Looping forever...'; sleep 2; done;"]
       containers:
         - name: todo-backend
-          image: image: gcr.io/PROJECT_ID/IMAGE
+          image: gcr.io/PROJECT_ID/IMAGE
           imagePullPolicy: "Always"
           readinessProbe:
             initialDelaySeconds: 10 # Initial delay until the readiness is tested
