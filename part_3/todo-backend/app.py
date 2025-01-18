@@ -7,7 +7,6 @@ from models import Todo
 from json_encoder import AlchemyEncoder
 import json
 
-
 def create_app(test_config=None):
     app = Flask(__name__)
     app.json_encoder = AlchemyEncoder
