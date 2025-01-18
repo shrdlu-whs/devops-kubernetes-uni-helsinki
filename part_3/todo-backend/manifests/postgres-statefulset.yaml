@@ -47,5 +47,3 @@ spec:
         resources:
           requests:
             storage: 100Mi
-  strategy:
-    type: Recreate
