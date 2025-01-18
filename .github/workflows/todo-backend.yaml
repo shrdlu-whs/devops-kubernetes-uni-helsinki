@@ -1,18 +1,23 @@
+# Todo: Replace service account JSON key with Workload Identity Federationauthentication and short-lived authentication tokens:
+# https://github.com/marketplace/actions/authenticate-to-google-cloud#indirect-wif  
+
+
 name: Build and Deploy todo backend to GKE
 
 on:
   push:
     branches: 
-      - master
+      - main
     paths:
-      - 'todo-backend/**'
+      - './part_3/todo-backend/**'
       - '.github/workflows/todo-backend.yml'
 
 env:
   PROJECT_ID: ${{ secrets.GKE_PROJECT }}
   GKE_CLUSTER: dwk-cluster
   GKE_ZONE: europe-north1-b
-  IMAGE: dwk-environments
+  IMAGE: todo-backend
+  PATH: ./part_3/todo-backend
 
 jobs:
   setup-build-publish-deploy:
@@ -42,7 +47,7 @@ jobs:
     # Build the Docker image
     - name: Build
       run: |-
-        cd ./app6/ && docker build \
+        cd $PATH && docker build \
           --tag "gcr.io/$PROJECT_ID/$IMAGE:${GITHUB_REF#refs/heads/}-$GITHUB_SHA" \
           .
 
@@ -50,6 +55,15 @@ jobs:
     - name: Publish
       run: |-
         docker push "gcr.io/$PROJECT_ID/$IMAGE:${GITHUB_REF#refs/heads/}-$GITHUB_SHA"
+    
+    # Decrypt the credentials
+    - name: Decrypt secret
+      run: |-
+        curl -O -L -C - https://github.com/mozilla/sops/releases/download/v3.9.3/sops-v3.9.3.linux
+        sudo mv sops-v3.9.3.linux /usr/bin/sops
+        sudo chmod +x /usr/bin/sops
+        export SOPS_AGE_KEY=${{ secrets.GKE_DWK_SOPS_AGE_KEY }}
+        sops --decrypt $PATH/manifests/secret.enc.yaml > $PATH/manifests/secret.yaml
 
     # Set up kustomize
     - name: Set up Kustomize
@@ -58,7 +72,7 @@ jobs:
     # Deploy the Docker image to the GKE cluster
     - name: Deploy
       run: |-
-        cd ./todo-backend/
+        cd ./part_3/todo-application/
         kustomize edit set image gcr.io/PROJECT_ID/IMAGE:TAG=gcr.io/$PROJECT_ID/$IMAGE:${GITHUB_REF#refs/heads/}-$GITHUB_SHA
         kustomize build . | kubectl apply -f -
         kubectl rollout status deployment/$IMAGE
