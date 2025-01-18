@@ -71,7 +71,7 @@ def create_app(test_config=None):
             print(app.config['SQLALCHEMY_DATABASE_URI'])
         
     print(f"Server running on port {app.config['FLASK_RUN_PORT']}")
-    
+
     return app
     
     
