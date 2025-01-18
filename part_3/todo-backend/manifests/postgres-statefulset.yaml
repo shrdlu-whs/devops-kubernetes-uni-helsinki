@@ -43,7 +43,7 @@ spec:
         namespace: todo-app
       spec:
         accessModes: ["ReadWriteOnce"]
-        storageClassName: local-path
+        storageClassName: standard-rwo
         resources:
           requests:
             storage: 100Mi
