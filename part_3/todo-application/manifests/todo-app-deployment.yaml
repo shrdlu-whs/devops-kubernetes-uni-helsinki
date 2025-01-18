@@ -1,17 +1,17 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: todo-app-dep
+  name: todo-app
   namespace: todo-app
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: todo-application
+      app: todo-app
   template:
     metadata:
       labels:
-        app: todo-application
+        app: todo-app
     spec:
       volumes:
         - name: todo-app-image
@@ -69,10 +69,10 @@ spec:
                 key: todo-backend-port
           resources:
             limits:
-              memory: "250Mi"
+              memory: "200Mi"
               cpu: "150m"
             requests:
               memory: "150Mi"
               cpu: "100m"
-    strategy:
-      type: Recreate
+  strategy:
+    type: Recreate
