@@ -14,6 +14,7 @@ on:
 
 env:
   PROJECT_ID: ${{ secrets.GKE_PROJECT }}
+  GKE_DWK_SOPS_AGE_KEY: ${{ secrets.GKE_DWK_SOPS_AGE_KEY }}
   GKE_CLUSTER: dwk-cluster
   GKE_ZONE: europe-north1-b
   IMAGE: todo-application
