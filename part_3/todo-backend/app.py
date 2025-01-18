@@ -13,8 +13,6 @@ import json
 def create_app(test_config=None):
     app = Flask(__name__)
     app.json_encoder = AlchemyEncoder
-    #app.register_blueprint(healthz, url_prefix="/healthz")
-    #Healthz(app)
     env_config = os.getenv("APP_SETTINGS", "config.DevelopmentConfig")
     app.config.from_object(env_config)
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
