@@ -6,7 +6,7 @@ metadata:
 spec:
   type: NodePort
   selector:
-    app: todo-backend
+    app: todo-backend-dep
   ports:
     - port: 5000
       targetPort: 5000
