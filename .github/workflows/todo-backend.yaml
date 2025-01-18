@@ -91,5 +91,6 @@ jobs:
         cd $APP_PATH
         kustomize edit set image gcr.io/PROJECT_ID/IMAGE:TAG=gcr.io/$PROJECT_ID/$IMAGE:${GITHUB_REF#refs/heads/}-$GITHUB_SHA
         kustomize build . | kubectl apply -f -
+        kubectl create namespace todo-app || true
         kubectl rollout status deployment/$IMAGE
         kubectl get services -o wide

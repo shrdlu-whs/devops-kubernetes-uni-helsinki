@@ -77,5 +77,5 @@ spec:
             requests:
               memory: "128Mi"
               cpu: "100m"
-    strategy:
-      type: Recreate
+  strategy:
+    type: Recreate
