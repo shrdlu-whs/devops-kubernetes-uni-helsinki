@@ -1,5 +1,5 @@
 import os
-from flask import Flask, request, redirect, url_for, jsonify
+from flask import Flask, request, redirect
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.sql import text
 from database import db
