@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: wiki-server-svc
+  namespace: wiki-server
+spec:
+  type: ClusterIP
+  selector:
+    app: wiki-server
+  ports:
+    - port: 5000
+      targetPort: 80
+      protocol: TCP

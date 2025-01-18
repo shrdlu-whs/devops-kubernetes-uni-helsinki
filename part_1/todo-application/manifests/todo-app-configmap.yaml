@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: todo-app-configmap
+data:
+  flask-env: development
+  flask-run-port: "5000"
+  flask-run-host: "0.0.0.0"
+  postgres-host: "postgres-svc"
+  app-settings: "config.DevelopmentConfig"

@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: todo-app-configmap
+  namespace: todo-app
+data:
+  flask-env: development
+  flask-run-port: "5000"
+  flask-run-host: "0.0.0.0"
+  todo-backend-host: "http://todo-backend-svc"
+  todo-backend-port: "5000"
+  app-settings: "config.DevelopmentConfig"

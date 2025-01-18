@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: log-output-app-configmap
+  namespace: log-output
+data:
+  message: "This is a message from Configmap"
+  pingpong_app_url: "http://pingpong-app-svc"
+  pingpong_app_port: "5000"
+  config-path: "/app/config"
+  flask-env: "development"
+  flask-run-port: "5000"
+  flask-run-host: "0.0.0.0"
+  # file-like keys
+  information.txt: |
+    this text is from file 

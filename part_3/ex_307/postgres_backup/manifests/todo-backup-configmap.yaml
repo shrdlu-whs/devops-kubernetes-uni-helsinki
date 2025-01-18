@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: todo-backup-configmap
+  namespace: todo-app
+data:
+  postgres-host: "postgres-svc"
+  postgres-backup-bucket: "todo-pg-backup"

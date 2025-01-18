@@ -1,0 +1,16 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: wiki-server-ingress
+  namespace: wiki-server
+spec:
+  rules:
+  - http:
+      paths:
+      - path: /wikiserver
+        pathType: Prefix
+        backend:
+          service:
+            name: wiki-server-svc
+            port:
+              number: 5000

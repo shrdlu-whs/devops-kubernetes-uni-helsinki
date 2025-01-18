@@ -1,0 +1,74 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pingpong-app-dep
+  namespace: log-output
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: pingpong-app
+  template:
+    metadata:
+      labels:
+        app: pingpong-app
+    spec:
+      containers:
+        - name: pingpong-app
+          image: cdaniel999/pingpong-app:latest
+          imagePullPolicy: "Always"
+          readinessProbe:
+            initialDelaySeconds: 10 # Initial delay until the readiness is tested
+            periodSeconds: 5 # How often to test
+            httpGet:
+               path: /health
+               port: 5000
+          livenessProbe:
+            initialDelaySeconds: 20 # Initial delay until the liveness is tested
+            periodSeconds: 5 # How often to test
+            httpGet:
+               path: /health
+               port: 5000
+          env:
+           - name: FLASK_ENV
+             valueFrom:
+              configMapKeyRef:
+               name: pingpong-app-configmap
+               key: flask-env
+           - name: FLASK_RUN_HOST
+             valueFrom:
+              configMapKeyRef:
+               name: pingpong-app-configmap
+               key: flask-run-host
+           - name: FLASK_RUN_PORT
+             valueFrom:
+              configMapKeyRef:
+               name: pingpong-app-configmap
+               key: flask-run-port
+           - name: APP_SETTINGS
+             valueFrom:
+              configMapKeyRef:
+               name: pingpong-app-configmap
+               key: app-settings
+           - name: POSTGRES_HOST
+             valueFrom:
+              configMapKeyRef:
+               name: pingpong-app-configmap
+               key: postgres-host
+           - name: POSTGRES_USER
+             valueFrom:
+              secretKeyRef:
+                key: user
+                name: postgres-credentials
+           - name: POSTGRES_PASSWORD
+             valueFrom:
+              secretKeyRef:
+                key: password
+                name: postgres-credentials
+          resources:
+            limits:
+              memory: "128Mi"
+              cpu: "100m"
+            requests:
+              memory: "128Mi"
+              cpu: "100m"

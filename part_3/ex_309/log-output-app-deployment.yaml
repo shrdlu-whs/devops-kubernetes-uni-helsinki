@@ -1,0 +1,108 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: log-output-app-dep
+  namespace: log-output
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: log-output-app
+  template:
+    metadata:
+      labels:
+        app: log-output-app
+    spec:
+      volumes:
+      # A volume to store log output data in log-reader container
+        - name: cache-volume
+          emptyDir:
+            sizeLimit: 20Mi
+            medium: Memory
+      # A volume to share data between log-generator and log-reader containers
+        - name: log-shared-data
+          emptyDir:
+            sizeLimit: 20Mi
+            medium: Memory
+        - name: config
+          configMap:
+            name: log-output-app-configmap
+            # An array of keys from the ConfigMap to create as files
+            items:
+            - key: "information.txt"
+              path: "information.txt"
+      containers:
+        - name: log-generator
+          image: cdaniel999/log-generator:latest
+          readinessProbe:
+            initialDelaySeconds: 10 # Initial delay until the readiness is tested
+            periodSeconds: 5 # How often to test
+            httpGet:
+               path: /health
+               port: 5000
+          livenessProbe:
+            initialDelaySeconds: 20 # Initial delay until the liveness is tested
+            periodSeconds: 5 # How often to test
+            httpGet:
+               path: /health
+               port: 5000
+          volumeMounts:
+          - name: log-shared-data
+            mountPath: /app/files
+          imagePullPolicy: "Always"
+          resources:
+            limits:
+              memory: "56Mi"
+              cpu: "100m"
+            requests:
+              memory: "128Mi"
+              cpu: "100m"
+        - name: log-reader
+          image: cdaniel999/log-reader:latest
+          volumeMounts:
+          - name: config
+            mountPath: "/app/config"
+            readOnly: true
+          - name: log-shared-data
+            mountPath: /app/files
+          - name: cache-volume
+            mountPath: /app/cache
+          env:
+            - name: MESSAGE
+              valueFrom:
+                configMapKeyRef:
+                  name: log-output-app-configmap
+                  key: message
+            - name: PINGPONG_APP_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: log-output-app-configmap
+                  key: pingpong_app_url
+            - name: PINGPONG_APP_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: log-output-app-configmap
+                  key: pingpong_app_port
+            - name: CONFIG_PATH
+              valueFrom:
+                configMapKeyRef:
+                  name: log-output-app-configmap
+                  key: config-path
+            - name: FLASK_RUN_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: log-output-app-configmap
+                  key: flask-run-host
+            - name: FLASK_RUN_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: log-output-app-configmap
+                  key: flask-run-port
+          imagePullPolicy: "Always"
+          resources:
+            limits:
+              memory: "128Mi"
+              cpu: "150m"
+            requests:
+              memory: "128Mi"
+              cpu: "125m"

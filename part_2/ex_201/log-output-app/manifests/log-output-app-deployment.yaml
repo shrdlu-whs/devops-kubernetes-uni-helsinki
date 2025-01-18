@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: log-output-app-dep
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: log-output-app
+  template:
+    metadata:
+      labels:
+        app: log-output-app
+    spec:
+      volumes:
+        - name: log-shared-data
+          persistentVolumeClaim:
+            claimName: log-shared-volume-claim
+      containers:
+        - name: log-generator
+          image: cdaniel999/log-generator:latest
+          volumeMounts:
+          - name: log-shared-data
+            mountPath: /app/files
+          imagePullPolicy: "Always"
+          resources:
+            limits:
+              memory: "128Mi"
+              cpu: "500m"
+            requests:
+              memory: "64Mi"
+              cpu: "250m"
+        - name: log-reader
+          image: cdaniel999/log-reader:latest
+          volumeMounts:
+          - name: log-shared-data
+            mountPath: /app/files
+          imagePullPolicy: "Always"
+          resources:
+            limits:
+              memory: "128Mi"
+              cpu: "500m"
+            requests:
+              memory: "64Mi"
+              cpu: "250m"

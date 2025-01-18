@@ -1,0 +1,48 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: postgres-backup
+  namespace: todo-app
+spec:
+  schedule: "0 0 * * *"  # Every 24 hours at midnight
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: postgres-backup
+            image: cdaniel999/postgres-backup:latest
+            env:
+             - name: POSTGRES_HOST
+               valueFrom:
+                configMapKeyRef:
+                 name: todo-backup-configmap
+                 key: postgres-host
+             - name: POSTGRES_BACKUP_BUCKET
+               valueFrom:
+                configMapKeyRef:
+                 name: todo-backup-configmap
+                 key: postgres-backup-bucket
+             - name: POSTGRES_USER
+               valueFrom:
+                secretKeyRef:
+                 key: user
+                 name: postgres-credentials
+             - name: POSTGRES_PASSWORD
+               valueFrom:
+                secretKeyRef:
+                 key: password
+                 name: postgres-credentials
+             - name: AUTH_TOKEN
+               valueFrom:
+                secretKeyRef:
+                 key: gcs-auth-token
+                 name: gcs-auth
+            volumeMounts:
+            - name: dump-volume
+              mountPath: /dump
+            command: ["/bin/bash", "-c", "/usr/src/app/backup.sh"]
+          restartPolicy: OnFailure
+          volumes:
+          - name: dump-volume
+            emptyDir: {}

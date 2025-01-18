@@ -1,0 +1,8 @@
+# Python
+__pycache__
+.env
+venv
+# VS Code
+.history
+# Sqlite
+instance

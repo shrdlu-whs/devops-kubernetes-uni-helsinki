@@ -1,0 +1,24 @@
+# CronJob that adds a random Wikipedia article to read to the To Do list every hour
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: daily-todo
+spec:
+  schedule: "0 * * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: daily-todo-cronjob
+            image: alpine
+            imagePullPolicy: IfNotPresent
+            command: ["/bin/sh"]
+            args:
+              - -c
+              - >
+                apk update && apk add --no-cache curl bash && bash -c 
+                " curl -I https://en.wikipedia.org/wiki/Special:Random | grep location: | grep -Eo '(http|https)://[a-zA-Z0-9./?=_-]*' | \
+                 xargs -t -I % curl -v todo-svc:5000/todos/add --data-urlencode 'title=Read recommended Wiki article: %'
+                "  
+          restartPolicy: OnFailure

@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pingpong-app-dep
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: pingpong-app
+  template:
+    metadata:
+      labels:
+        app: pingpong-app
+    spec:
+      volumes:
+        - name: log-pingpong-shared-data
+          persistentVolumeClaim:
+            claimName: log-pingpong-volume-claim
+      containers:
+        - name: pingpong-app
+          image: cdaniel999/pingpong-app:latest
+          volumeMounts:
+          - name: log-pingpong-shared-data
+            mountPath: /app/shared
+          imagePullPolicy: "Always"
+          resources:
+            limits:
+              memory: "128Mi"
+              cpu: "500m"
+            requests:
+              memory: "64Mi"
+              cpu: "250m"

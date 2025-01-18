@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Todo App</title>
+</head>
+
+<body>
+
+    <h1>To Do App</h1>
+
+    <img src="data:image/png;base64,{{image}}">
+
+    <form action="/todos/add" method="post">
+        <div>
+            <label>Todo Title</label>
+            <input type="text" name="title" maxlength="140" placeholder="Enter Todo...">
+            <br>
+            <button type="submit">Add</button>
+        </div>
+    </form>
+
+    <hr>
+   
+    {% for todo in todo_list %}
+
+    <p>{{todo.id }} | {{ todo.title }}</p>
+
+    {% if todo.done == False %}
+    <span>Not Done</span>
+    {% else %}
+    <span>Done</span>
+    {% endif %}
+    <form action="/todos/{{ todo.id }}" method="post">
+            <button type="submit" style="height: 20px; width: 50px">Update</button></form><form action="/todos/delete/{{ todo.id }}" method="post"><button type="submit" style="height: 20px; width: 50px">Delete</button></form>
+    {% endfor %}
+</body>
+
+</html>

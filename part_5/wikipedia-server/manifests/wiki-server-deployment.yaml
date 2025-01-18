@@ -1,0 +1,64 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: wiki-server
+  labels:
+    name: wiki-server
+spec:
+  selector:
+    matchLabels:
+      name: wiki-server
+  template:
+    metadata:
+      labels:
+        name: wiki-server
+    spec:
+      initContainers:
+        # Load Kubernetes wikipedia html into nginx-html volume
+        - name: init-nginx
+          image: curlimages/curl
+          volumeMounts:
+          - name: nginx-html
+            mountPath: /data
+          command: ["/bin/sh","-c"]
+          args: ["curl -L -o /data/index.html https://en.wikipedia.org/wiki/Kubernetes"]
+      containers:
+      - name: nginx
+        image: nginx:1.21.6-alpine
+        volumeMounts:
+          - name: nginx-html
+            mountPath: /www/html
+          - name: nginx-config
+            mountPath: /etc/nginx
+        ports:
+        - containerPort: 80
+        resources:
+          limits:
+            memory: "150Mi"
+            cpu: "100m"
+          requests:
+            memory: "100Mi"
+            cpu: "100m"
+      # a sidecar container that waits for a random time between 5 and 15 minutes, curls for a random Wikipedia page and saves the page content to the public www directory for the main container
+      - name: nginx-sidecar
+        image: curlimages/curl
+        volumeMounts:
+        - name: nginx-html
+          mountPath: /data
+        command: ["/bin/sh","-c"]
+        args: ["sleep $(( ( RANDOM % 900 )  + 300 )) && curl -L -o /data/index.html https://en.wikipedia.org/wiki/Special:Random && grep -Po '(?<=<title>).*?(?=</title>)' /data/index.html |  xargs -t -I % echo 'Loaded Wiki article %'"]
+      volumes:
+       - name: nginx-html
+         emptyDir:
+           sizeLimit: 20Mi
+         volumes:
+       - name: nginx-config
+         configMap:
+          name: nginx-config
+          items:
+            - key: "nginx.conf"
+              path: "nginx.conf"
+
+
+
+

@@ -1,0 +1,56 @@
+#kubectl create configmap postgres --from-file=etc/postgresql/
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: postgres-ss
+spec:
+  serviceName: postgres-svc
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgres
+  template:
+    metadata:
+      labels:
+        app: postgres
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:13.0
+          ports:
+            - name: postgres
+              containerPort: 5432
+          #args:
+          #  - "-c"
+          #  - "config_file=/etc/postgresql/postgresql.conf"
+          env:
+           - name: POSTGRES_USER
+             valueFrom:
+               secretKeyRef:
+                 name: postgres-credentials
+                 key: user
+           - name: POSTGRES_PASSWORD
+             valueFrom:
+              secretKeyRef:
+                 name: postgres-credentials
+                 key: password
+           - name: POSTGRES_HOST_AUTH_METHOD
+             value: trust
+          volumeMounts:
+            - name: data
+              mountPath: /var/lib/postgresql/data
+            #- name: postgres-config
+             # mountPath: /etc/postgres
+          #volumes:
+          #- name: postgres-config
+            #configMap:
+            # name: postgres      
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        storageClassName: local-path
+        resources:
+          requests:
+            storage: 100Mi

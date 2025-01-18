@@ -1,0 +1,12 @@
+apiVersion: k3d.io/v1alpha4
+kind: Simple
+servers: 1
+ports:
+  - port: 80:31080
+  - port: 443:31443
+options:
+  k3s: # options passed on to K3s itself
+    extraArgs: # additional arguments passed to the `k3s server|agent` command; same as `--k3s-arg`
+      - arg: --disable=traefik
+        nodeFilters:
+          - server:*

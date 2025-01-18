@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: log-output-app-configmap
+  namespace: log-output
+data:
+  message: "This is a message from Configmap"
+  pingpong_app_url: "http://pingpong-app-svc"
+  pingpong_app_port: "5000"
+  config-path: "/app/config"
+  # file-like keys
+  information.txt: |
+    this text is from file 

@@ -1,0 +1,1 @@
+In my cluster, there are two StatefulSets in the prometheus namespace, each running one pod (see StatefulSetRunningPods1.png and StatefulSetRunningPods2.png). Thus the corresponding Prometheus query also returns 2.
