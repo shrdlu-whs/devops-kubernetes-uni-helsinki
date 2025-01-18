@@ -29,7 +29,6 @@ def create_app(test_config=None):
         todo_list = json.dumps(todo_list, cls=AlchemyEncoder)
         return todo_list
 
-
     @app.post("/todos/add")
     def add():
         title = request.form.get("title", type=str)
