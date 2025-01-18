@@ -5,7 +5,6 @@ from sqlalchemy.sql import text
 from database import db
 from models import Todo
 import utils
-# json encoding
 from json_encoder import AlchemyEncoder
 import json
 
