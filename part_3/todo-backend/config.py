@@ -14,7 +14,7 @@ class Config(object):
     FLASK_RUN_HOST = os.getenv('FLASK_RUN_HOST', '0.0.0.0')
     FLASK_RUN_PORT = os.getenv('FLASK_RUN_PORT', '5000')
 
-
+# Production config variables
 class ProductionConfig(Config):
     DEBUG = False
 
