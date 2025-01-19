@@ -1,0 +1,80 @@
+# Todo: Replace service account JSON key with Workload Identity Federationauthentication and short-lived authentication tokens:
+# https://github.com/marketplace/actions/authenticate-to-google-cloud#indirect-wif  
+
+
+name: Build and deploy todo application to GKE
+
+on:
+  push:
+    branches: 
+      - main
+    paths:
+      - 'part_3/todo-application/**'
+      - '.github/workflows/todo-application.yaml'
+
+env:
+  PROJECT_ID: ${{ secrets.GKE_PROJECT }}
+  GKE_CLUSTER: dwk-cluster
+  GKE_ZONE: europe-north1-b
+  IMAGE: todo-app
+  APP_PATH: ./part_3/todo-application
+
+jobs:
+  setup-build-publish-deploy:
+    name: Setup, Build, Publish, and Deploy
+    runs-on: ubuntu-latest
+
+    steps:
+
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    - id: 'auth'
+      uses: 'google-github-actions/auth@v2'
+      with:
+        credentials_json: '${{ secrets.GKE_SA_KEY }}'
+
+    - name: 'Set up Cloud SDK'
+      uses: 'google-github-actions/setup-gcloud@v2'
+      with:
+        project_id: ${{ secrets.GKE_PROJECT }}
+
+    # Configure Docker to use the gcloud command-line tool as a credential
+    # helper for authentication
+    - run: |-
+        gcloud --quiet auth configure-docker
+
+    # Install gke-gcloud-auth-plugin
+    - name: Install gke-gcloud-auth-plugin
+      run: |-
+        gcloud components install gke-gcloud-auth-plugin
+
+    # Get the GKE credentials so we can deploy to the cluster
+    - run: |-
+        gcloud container clusters get-credentials "$GKE_CLUSTER" --zone "$GKE_ZONE"
+
+    # Build the Docker image
+    - name: Build
+      run: |-
+        cd $APP_PATH && docker build \
+          --tag "gcr.io/$PROJECT_ID/$IMAGE:${GITHUB_REF#refs/heads/}-$GITHUB_SHA" \
+          .
+
+    # Push the Docker image to Google Container Registry
+    - name: Publish
+      run: |-
+        docker push "gcr.io/$PROJECT_ID/$IMAGE:${GITHUB_REF#refs/heads/}-$GITHUB_SHA"
+    
+    # Set up kustomize
+    - name: Set up Kustomize
+      uses: imranismail/setup-kustomize@v1
+
+    # Deploy the Docker image to the GKE cluster
+    - name: Deploy
+      run: |-
+        cd $APP_PATH
+        kustomize edit set image gcr.io/PROJECT_ID/IMAGE:TAG=gcr.io/$PROJECT_ID/$IMAGE:${GITHUB_REF#refs/heads/}-$GITHUB_SHA
+        kubectl create namespace todo-app || true
+        kustomize build . | kubectl apply -k . -n todo-app
+        kubectl rollout status deployment/$IMAGE -n todo-app
+        kubectl get services -o wide

@@ -1,0 +1,76 @@
+apiVersion: apps/v1 
+kind: Deployment                    
+metadata:
+  name: todo-backend
+  namespace: todo-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: todo-backend
+  template:
+    metadata:
+      labels:
+        app: todo-backend
+    spec:
+      containers:
+        - name: todo-backend
+          image: gcr.io/PROJECT_ID/IMAGE:TAG
+          imagePullPolicy: "Always"
+          readinessProbe:
+            initialDelaySeconds: 10 # Initial delay until the readiness is tested
+            periodSeconds: 5 # How often to test
+            httpGet:
+               path: /health
+               port: 5000
+          livenessProbe:
+            initialDelaySeconds: 20 # Initial delay until the liveness is tested
+            periodSeconds: 5 # How often to test
+            httpGet:
+               path: /health
+               port: 5000
+          env:
+           - name: FLASK_ENV
+             valueFrom:
+              configMapKeyRef:
+               name: todo-backend-configmap
+               key: flask-env
+           - name: FLASK_RUN_HOST
+             valueFrom:
+              configMapKeyRef:
+               name: todo-backend-configmap
+               key: flask-run-host
+           - name: FLASK_RUN_PORT
+             valueFrom:
+              configMapKeyRef:
+               name: todo-backend-configmap
+               key: flask-run-port
+           - name: APP_SETTINGS
+             valueFrom:
+              configMapKeyRef:
+               name: todo-backend-configmap
+               key: app-settings
+           - name: POSTGRES_HOST
+             valueFrom:
+              configMapKeyRef:
+               name: todo-backend-configmap
+               key: postgres-host
+           - name: POSTGRES_USER
+             valueFrom:
+              secretKeyRef:
+                key: user
+                name: postgres-credentials
+           - name: POSTGRES_PASSWORD
+             valueFrom:
+              secretKeyRef:
+                key: password
+                name: postgres-credentials
+          resources:
+            limits:
+              memory: "125Mi"
+              cpu: "125m"
+            requests:
+              memory: "100Mi"
+              cpu: "100m"
+  strategy:
+    type: Recreate
