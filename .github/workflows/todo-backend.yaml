@@ -81,7 +81,7 @@ jobs:
 
     # Deploy the Docker image to the GKE cluster in default namespace
     - name: Deploy
-      if: contains(github.ref, "main") || github.ref == 'refs/heads/main'
+      if: contains(github.ref, 'main') || github.ref == 'refs/heads/main'
       run: |-
         cd $APP_PATH
         kubectl create namespace todo-app || true
