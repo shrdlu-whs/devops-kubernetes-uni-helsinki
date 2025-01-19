@@ -6,8 +6,6 @@ name: Build and deploy todo application to GKE
 
 on:
   push:
-    #branches: 
-    #  - main
     paths:
       - 'part_3/todo-application/**'
       - '.github/workflows/todo-application.yaml'
@@ -71,7 +69,7 @@ jobs:
 
    # Deploy the Docker image to the GKE cluster in default namespace
     - name: Deploy
-      if: ${{ github.ref == 'refs/heads/main' }}
+      if: contains(github.ref, 'main') || github.ref == 'refs/heads/main'
       run: |-
         cd $APP_PATH
         kubectl create namespace todo-app || true
@@ -82,9 +80,9 @@ jobs:
         kubectl get services -o wide
       
     
-        # Deploy the Docker image to the GKE cluster in branch namespace
+    # Deploy the Docker image to the GKE cluster in branch namespace
     - name: Deploy
-      if: ${{ ! github.ref == 'refs/heads/main' }}
+      if: "!contains(github.ref, 'main')" 
       run: |-
         cd $APP_PATH
         kubectl create namespace ${GITHUB_REF#refs/heads/} || true
@@ -94,4 +92,3 @@ jobs:
         kustomize build . | kubectl apply -k .
         kubectl rollout status deployment/$IMAGE
         kubectl get services -o wide
-      
