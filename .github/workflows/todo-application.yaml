@@ -65,15 +65,6 @@ jobs:
       run: |-
         docker push "gcr.io/$PROJECT_ID/$IMAGE:${GITHUB_REF#refs/heads/}-$GITHUB_SHA"
     
-    # Decrypt the credentials
-    - name: Decrypt secret
-      run: |-
-        curl -LO https://github.com/getsops/sops/releases/download/v3.9.3/sops-v3.9.3.linux.amd64
-        sudo mv sops-v3.9.3.linux.amd64 /usr/bin/sops
-        sudo chmod +x /usr/bin/sops
-        export SOPS_AGE_KEY=${{ secrets.GKE_DWK_SOPS_AGE_KEY }}
-        sops --decrypt $APP_PATH/manifests/secret.enc.yaml > $APP_PATH/manifests/secret.yaml
-
     # Set up kustomize
     - name: Set up Kustomize
       uses: imranismail/setup-kustomize@v1
