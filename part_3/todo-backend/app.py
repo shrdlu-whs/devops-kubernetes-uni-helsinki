@@ -16,6 +16,7 @@ def create_app(test_config=None):
     db.app = app
     try:
         db.init_app(app)
+        db.create_all()
     except Exception as e:
         print(e)
         print(app.config['SQLALCHEMY_DATABASE_URI'])
