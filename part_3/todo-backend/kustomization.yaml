@@ -6,8 +6,4 @@ resources:
 - manifests/postgres-service.yaml
 - manifests/todo-backend-configmap.yaml
 - manifests/kustom-deployment.yaml
-- manifests/todo-backend-ingress.yaml
 - manifests/todo-backend-service.yaml
-#images:
-#- name: gcr.io/PROJECT_ID/IMAGE
-#  newName: cdaniel999/todo-backend:latest

@@ -6,8 +6,8 @@ name: Build and deploy todo backend to GKE
 
 on:
   push:
-    branches: 
-      - main
+    #branches: 
+    #  - main
     paths:
       - 'part_3/todo-backend/**'
       - '.github/workflows/todo-backend.yaml'
@@ -78,12 +78,30 @@ jobs:
     - name: Set up Kustomize
       uses: imranismail/setup-kustomize@v1
 
-    # Deploy the Docker image to the GKE cluster
+
+    # Deploy the Docker image to the GKE cluster in default namespace
     - name: Deploy
+      if: ${{ github.ref == 'refs/heads/main' }}
       run: |-
         cd $APP_PATH
-        kustomize edit set image gcr.io/PROJECT_ID/IMAGE:TAG=gcr.io/$PROJECT_ID/$IMAGE:${GITHUB_REF#refs/heads/}-$GITHUB_SHA
         kubectl create namespace todo-app || true
+         kubectl config set-context --current --namespace=todo-app
+        kustomize edit set image gcr.io/PROJECT_ID/IMAGE:TAG=gcr.io/$PROJECT_ID/$IMAGE:${GITHUB_REF#refs/heads/}-$GITHUB_SHA
         kustomize build . | kubectl apply -k . -n todo-app
         kubectl rollout status deployment/$IMAGE -n todo-app
         kubectl get services -o wide
+      
+    
+        # Deploy the Docker image to the GKE cluster in branch namespace
+    - name: Deploy
+      if: ${{ ! github.ref == 'refs/heads/main' }}
+      run: |-
+        cd $APP_PATH
+        kubectl create namespace ${GITHUB_REF#refs/heads/} || true
+        kubectl config set-context --current --namespace=${GITHUB_REF#refs/heads/}
+        kustomize edit set namespace ${GITHUB_REF#refs/heads/}
+        kustomize edit set image gcr.io/PROJECT_ID/IMAGE:TAG=gcr.io/$PROJECT_ID/$IMAGE:${GITHUB_REF#refs/heads/}-$GITHUB_SHA
+        kustomize build . | kubectl apply -k .
+        kubectl rollout status deployment/$IMAGE
+        kubectl get services -o wide
+      
