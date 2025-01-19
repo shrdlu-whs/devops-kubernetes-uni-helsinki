@@ -16,7 +16,8 @@ def create_app(test_config=None):
     @app.route("/todolist")
     def home():
         
-        todo_list = requests.get(f'{TODO_BACKEND_URL}/todos').json()
+        todo_list = requests.get(f'{TODO_BACKEND_URL}/todos').read()
+        json.loads(todo_list.decode("utf-8"))
         image = utils.get_random_image()
         return render_template("base.html", todo_list=todo_list, image=image)
     
