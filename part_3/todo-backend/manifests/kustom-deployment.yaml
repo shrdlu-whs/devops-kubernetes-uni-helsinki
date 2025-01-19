@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: todo-app
-          image: gcr.io/PROJECT_ID/IMAGE
+          image: gcr.io/PROJECT_ID/IMAGE:TAG
           imagePullPolicy: "Always"
           readinessProbe:
             initialDelaySeconds: 10 # Initial delay until the readiness is tested
