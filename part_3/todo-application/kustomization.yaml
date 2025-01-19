@@ -7,7 +7,3 @@ resources:
 - manifests/todo-service.yaml
 - manifests/todo-app-ingress.yaml
 - manifests/daily-todo-cronjob.yaml
-
-images:
-- name: gcr.io/PROJECT_ID/IMAGE
-  newName: cdaniel999/todo-backend:latest
