@@ -16,7 +16,7 @@ env:
   PROJECT_ID: ${{ secrets.GKE_PROJECT }}
   GKE_CLUSTER: dwk-cluster
   GKE_ZONE: europe-north1-b
-  IMAGE: todo-application
+  IMAGE: todo-app
   APP_PATH: ./part_3/todo-application
 
 jobs:
