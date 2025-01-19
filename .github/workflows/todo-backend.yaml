@@ -10,7 +10,7 @@ on:
       - main
     paths:
       - 'part_3/todo-backend/**'
-      - '.github/workflows/todo-backend.yml'
+      - '.github/workflows/todo-backend.yaml'
 
 env:
   PROJECT_ID: ${{ secrets.GKE_PROJECT }}
@@ -38,13 +38,6 @@ jobs:
       uses: 'google-github-actions/setup-gcloud@v2'
       with:
         project_id: ${{ secrets.GKE_PROJECT }}
-
-   # - name: Set up Cloud SDK
-   #   uses: google-github-actions/setup-gcloud
-   #   with:
-   #     project_id: ${{ secrets.GKE_PROJECT }}
-    #    service_account_key: ${{ secrets.GKE_SA_KEY }}
-    #    export_default_credentials: true
 
     # Configure Docker to use the gcloud command-line tool as a credential
     # helper for authentication

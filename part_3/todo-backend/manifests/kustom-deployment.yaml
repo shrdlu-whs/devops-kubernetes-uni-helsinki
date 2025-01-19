@@ -1,25 +1,20 @@
 apiVersion: apps/v1 
 kind: Deployment                    
 metadata:
-  name: todo-backend
+  name: todo-app
   namespace: todo-app
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: todo-backend
+      app: todo-app
   template:
     metadata:
       labels:
-        app: todo-backend
+        app: todo-app
     spec:
-      #initContainers:
-      #  - name: wait-for-services
-      #    image: busybox
-      #    command: ["/bin/sh","-c"]
-      #    args: ["until echo 'Waiting for postgres...' && nc -vz -w 2 postgres 5432 do echo 'Looping forever...'; sleep 2; done;"]
       containers:
-        - name: todo-backend
+        - name: todo-app
           image: gcr.io/PROJECT_ID/IMAGE
           imagePullPolicy: "Always"
           readinessProbe:
