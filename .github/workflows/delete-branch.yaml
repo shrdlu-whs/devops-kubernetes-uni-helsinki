@@ -1,0 +1,64 @@
+
+name: Delete namespace contents for deleted branch in GKE
+
+on:
+  delete:
+    branches:
+
+env:
+  PROJECT_ID: ${{ secrets.GKE_PROJECT }}
+  GKE_CLUSTER: dwk-cluster
+  GKE_ZONE: europe-north1-b
+  IMAGE: todo-backend
+  APP_PATH: ./part_3/todo-backend
+
+jobs:
+  setup-build-publish-deploy:
+    name: Setup, Build, Publish, and Deploy
+    runs-on: ubuntu-latest
+
+    steps:
+
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    # Note: the delete trigger does not transmit the branch name on which the delete was triggered but assumes default branch.
+    # This is why the branch name has to be extracted from context
+    - name: Github context
+      run: echo "${{ toJson(github) }}"
+    
+    - name: Set Branch name
+      run: |
+          BRANCH=$(cat ${{ github.event_path }} | jq --raw-output '.ref')
+          echo "${{ github.repository }} has ${BRANCH} branch"
+          echo "::set-env name=STAGE::$(echo ${BRANCH})"
+
+    - name: Echo Branch name
+      run: echo Deleting from STAGE:$STAGE
+
+
+    - id: 'auth'
+      uses: 'google-github-actions/auth@v2'
+      with:
+        credentials_json: '${{ secrets.GKE_SA_KEY }}'
+
+    - name: 'Set up Cloud SDK'
+      uses: 'google-github-actions/setup-gcloud@v2'
+      with:
+        project_id: ${{ secrets.GKE_PROJECT }}
+
+    # Configure Docker to use the gcloud command-line tool as a credential
+    # helper for authentication
+    - run: |-
+        gcloud --quiet auth configure-docker
+
+    # Install gke-gcloud-auth-plugin
+    - name: Install gke-gcloud-auth-plugin
+      run: |-
+        gcloud components install gke-gcloud-auth-plugin
+
+    # Delete branch resources from cluster
+    - name: Delete
+      run: |-
+       kubectl config set-context --current --namespace=$STAGE
+       kubectl delete all --all -n --namespace=$STAGE
