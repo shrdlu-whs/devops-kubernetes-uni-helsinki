@@ -62,5 +62,5 @@ jobs:
     # Delete branch resources from cluster
     - name: Delete
       run: |-
-       kubectl config set-context --current --namespace=$STAGE
+       kubectl config set current-context --namespace=$STAGE
        kubectl delete all --all -n --namespace=$STAGE
