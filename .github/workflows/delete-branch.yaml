@@ -64,4 +64,4 @@ jobs:
       run: |-
        gcloud container clusters get-credentials $GKE_CLUSTER --zone=$GKE_ZONE
        kubectl config set-context --namespace $STAGE --current 
-       kubectl delete all --all -n --namespace=$STAGE
+       kubectl delete namespace=$STAGE
