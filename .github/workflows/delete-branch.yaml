@@ -62,5 +62,6 @@ jobs:
     # Delete branch resources from cluster
     - name: Delete
       run: |-
+       gcloud container clusters get-credentials $GKE_CLUSTER --zone=$GKE_ZONE
        kubectl config set-context --namespace $STAGE --current 
        kubectl delete all --all -n --namespace=$STAGE
