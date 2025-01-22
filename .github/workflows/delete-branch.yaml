@@ -4,6 +4,8 @@ name: Delete namespace contents for deleted branch in GKE
 on:
   delete:
     branches:
+      - develop
+      - staging
 
 env:
   PROJECT_ID: ${{ secrets.GKE_PROJECT }}
@@ -13,8 +15,8 @@ env:
   APP_PATH: ./part_3/todo-backend
 
 jobs:
-  setup-build-publish-deploy:
-    name: Setup, Build, Publish, and Deploy
+  setup-delete-branch:
+    name: Delete branch namespace
     runs-on: ubuntu-latest
 
     steps:
