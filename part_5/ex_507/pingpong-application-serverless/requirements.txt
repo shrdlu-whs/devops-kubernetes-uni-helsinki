@@ -1,0 +1,5 @@
+flask
+flask
+flask-sqlalchemy
+flask_healthz
+psycopg2-binary

@@ -12,11 +12,6 @@ spec:
       labels:
         app: todo-application
     spec:
-      #initContainers:
-      #  - name: wait-for-services
-      #    image: busybox
-      #    command: ["/bin/sh","-c"]
-      #    args: ["until echo 'Waiting for postgres...' && nc -vz -w 2 postgres 5432 do echo 'Looping forever...'; sleep 2; done;"]
       containers:
         - name: todo-application
           image: cdaniel999/todo-app:latest

@@ -1,0 +1,78 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: todo-app
+  namespace: todo-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: todo-app
+  template:
+    metadata:
+      labels:
+        app: todo-app
+    spec:
+      volumes:
+        - name: todo-app-image
+          persistentVolumeClaim:
+            claimName: todo-image-claim
+      containers:
+        - name: todo-application
+          image: cdaniel999/todo-app:latest
+          imagePullPolicy: "Always"
+          readinessProbe:
+            initialDelaySeconds: 10 # Initial delay until the readiness is tested
+            periodSeconds: 5 # How often to test
+            httpGet:
+               path: /health
+               port: 5000
+          livenessProbe:
+            initialDelaySeconds: 20 # Initial delay until the liveness is tested
+            periodSeconds: 5 # How often to test
+            httpGet:
+               path: /health
+               port: 5000
+          volumeMounts:
+          - name: todo-app-image
+            mountPath: /app/files
+          env:
+           - name: FLASK_ENV
+             valueFrom:
+              configMapKeyRef:
+               name: todo-app-configmap
+               key: flask-env
+           - name: FLASK_RUN_HOST
+             valueFrom:
+              configMapKeyRef:
+               name: todo-app-configmap
+               key: flask-run-host
+           - name: FLASK_RUN_PORT
+             valueFrom:
+              configMapKeyRef:
+               name: todo-app-configmap
+               key: flask-run-port
+           - name: APP_SETTINGS
+             valueFrom:
+              configMapKeyRef:
+                name: todo-app-configmap
+                key: app-settings
+           - name: TODO_BACKEND_HOST
+             valueFrom:
+              configMapKeyRef:
+                name: todo-app-configmap
+                key: todo-backend-host
+           - name: TODO_BACKEND_PORT
+             valueFrom:
+              configMapKeyRef:
+                name: todo-app-configmap
+                key: todo-backend-port
+          resources:
+            limits:
+              memory: "200Mi"
+              cpu: "150m"
+            requests:
+              memory: "150Mi"
+              cpu: "100m"
+  strategy:
+    type: Recreate
