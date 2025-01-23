@@ -54,7 +54,7 @@ def create_app(test_config=None):
         db.session.commit()
         return redirect("/todolist")
     
-    # Health check on routes /health and /
+    # Health check on route /health and route / for GKE Loadbalancer
     @app.route("/health")
     @app.route("/")
     def health():
