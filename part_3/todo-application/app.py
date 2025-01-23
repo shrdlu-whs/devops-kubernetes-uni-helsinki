@@ -24,6 +24,7 @@ def create_app(test_config=None):
         image = utils.get_random_image()
         return render_template("base.html", todo_list=todo_list, image=image)
     
+    # Health check
     @app.route("/health")
     @app.route("/")
     def health():
